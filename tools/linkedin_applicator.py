@@ -327,20 +327,16 @@ def apply_to_job(
     resume_path: Optional[Path],
     answer_gen: Callable,
     resume_content: str = "",
-    headless: bool = False,
+    headless: bool = None,  # None = auto (True on cloud, False locally)
 ) -> dict:
     """
     Apply to a LinkedIn job via Easy Apply (runs in a background thread).
-
-    Args:
-        job_url:        Full LinkedIn job URL.
-        resume_path:    PDF to upload as resume (None = skip upload).
-        answer_gen:     Callable(questions: list[str], resume: str) -> dict[str, str].
-        resume_content: Resume text passed to answer_gen.
-        headless:       False = show browser window (recommended for local use).
-
+    headless=None auto-selects: True on cloud, False locally (shows browser).
     Returns dict with keys: success, message, job_title, company, url.
     """
+    if headless is None:
+        from config import IS_CLOUD
+        headless = IS_CLOUD
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(
             _run_easy_apply, job_url, resume_path, answer_gen, resume_content, headless

@@ -1,28 +1,34 @@
-FROM python:3.11-slim
+FROM python:3.12-slim-bookworm
 
 WORKDIR /app
 
-# System deps (weasyprint needs these; skip if you don't need PDF generation)
+# System deps for CJK fonts + Playwright Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpango-1.0-0 libpangoft2-1.0-0 libgdk-pixbuf2.0-0 libffi-dev \
-    libcairo2 fonts-noto-cjk \
+    fonts-noto-cjk fonts-liberation \
+    libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 \
+    libcups2 libdrm2 libdbus-1-3 libxkbcommon0 \
+    libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
+    libgbm1 libasound2 libx11-xcb1 libxss1 \
+    libpangocairo-1.0-0 curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Python deps
+# Python deps + Playwright browser
 COPY requirements.txt .
-# Install without playwright browsers (cloud mode disables LinkedIn automation)
 RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir playwright || true
+    && playwright install chromium
 
-# App source
+# App source (gitignore keeps secrets/outputs out)
 COPY . .
 
-# Cloud mode: session-only storage, no LinkedIn automation
+# Cloud mode: each visitor gets session-isolated storage
 ENV DEPLOY_MODE=cloud
 ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8501
 
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s \
+    CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app.py", \
+     "--server.port=8501", "--server.address=0.0.0.0", \
+     "--server.headless=true"]

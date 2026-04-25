@@ -168,6 +168,22 @@ def _seed_from_disk():
 
 _init_state()
 
+
+@st.cache_resource(show_spinner=False)
+def _ensure_playwright():
+    """Install Playwright Chromium browser once per server process."""
+    import subprocess, sys
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "playwright", "install", "chromium"],
+            capture_output=True, text=True, timeout=300,
+        )
+    except Exception:
+        pass
+
+
+_ensure_playwright()
+
 # ── Auto-create first conversation if none exists ─────────────────────────────
 _store = ConversationStore()
 if st.session_state.current_conv_id is None:

@@ -130,14 +130,6 @@ def _handle_job_apply(
     session_state: dict,
     resume_content: str,
 ) -> str:
-    from config import IS_CLOUD
-    if IS_CLOUD:
-        return (
-            "⚠️ **云端部署不支持自动投简历功能**\n\n"
-            "LinkedIn Easy Apply 需要本地 Chrome 浏览器。\n"
-            "请在本地运行此应用以使用自动投递功能，或直接访问 LinkedIn 手动申请。"
-        )
-
     from tools.linkedin_auth import is_session_valid
     from tools.linkedin_applicator import apply_to_job, get_best_resume_pdf
 
@@ -216,7 +208,7 @@ def _handle_job_apply(
         resume_path=resume_pdf_path,
         answer_gen=answer_generator,
         resume_content=resume_content,
-        headless=False,
+        # headless auto-selected: True on cloud, False locally
     )
 
     # Clean up temp file

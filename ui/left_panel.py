@@ -211,13 +211,7 @@ def _render_materials_section():
 # ── LinkedIn status section ───────────────────────────────────────────────────
 
 def _render_linkedin_section():
-    from config import IS_CLOUD
-
     with st.expander(t("linkedin_status_header"), expanded=False):
-        if IS_CLOUD:
-            st.info("☁️ 云端部署模式：LinkedIn 自动投递功能仅在本地运行时可用。")
-            return
-
         from tools.linkedin_auth import is_session_valid, get_logged_in_email
         from tools.linkedin_applicator import load_applications_log
 

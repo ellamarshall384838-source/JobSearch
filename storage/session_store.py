@@ -188,17 +188,18 @@ def save_settings(
     }
 
 
-# ── LinkedIn session (cookies stored in session_state on cloud) ───────────────
+# ── LinkedIn session cookies ──────────────────────────────────────────────────
+# Stored via _scalar_store() so they survive page refresh in both local and
+# cloud modes (cloud uses _CLOUD_STORE keyed by URL ?sid=).
 
 def get_linkedin_cookies() -> Optional[list]:
-    return st.session_state.get("_linkedin_cookies")
+    return _scalar_store().get("linkedin_cookies")
 
 def save_linkedin_cookies(cookies: list) -> None:
-    st.session_state["_linkedin_cookies"] = cookies
+    _scalar_store()["linkedin_cookies"] = cookies
 
 def clear_linkedin_cookies() -> None:
-    st.session_state.pop("_linkedin_cookies", None)
+    _scalar_store().pop("linkedin_cookies", None)
 
 def has_linkedin_session() -> bool:
-    cookies = st.session_state.get("_linkedin_cookies")
-    return bool(cookies)
+    return bool(_scalar_store().get("linkedin_cookies"))
