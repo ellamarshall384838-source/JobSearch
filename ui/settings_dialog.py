@@ -81,17 +81,14 @@ def show_settings_dialog():
     st.caption(t("linkedin_section_caption"))
 
     # Two login method tabs
-    tab_pwd, tab_cookie = st.tabs(["🔑 账号密码登录", "🍪 Cookie 导入（推荐）"])
+    tab_pwd, tab_cookie = st.tabs([t("linkedin_tab_password"), t("linkedin_tab_cookie")])
 
     # ── Tab 1: Email + password ───────────────────────────────────────────────
     with tab_pwd:
         if IS_CLOUD:
-            st.info(
-                "☁️ 云端模式：账号密码登录使用无头浏览器。若 LinkedIn 触发安全验证，"
-                "请改用右侧「Cookie 导入」方式（更稳定）。"
-            )
+            st.info(t("linkedin_cloud_hint"))
         else:
-            st.caption("本地模式：将弹出可见浏览器窗口，如遇 2FA 可手动完成。")
+            st.caption(t("linkedin_local_hint"))
 
         li_email = st.text_input(
             t("linkedin_email_label"),
@@ -103,7 +100,7 @@ def show_settings_dialog():
             t("linkedin_password_label"),
             value=current.get("linkedin_password", ""),
             type="password",
-            placeholder="LinkedIn 密码",
+            placeholder=t("linkedin_password_ph"),
             key="li_pass",
         )
 
@@ -113,10 +110,7 @@ def show_settings_dialog():
             else:
                 save_settings(api_key.strip(), base_url.strip(), model.strip(),
                               li_email.strip(), li_password.strip())
-                if IS_CLOUD:
-                    st.info("正在使用无头浏览器登录（约 30-60 秒）…")
-                else:
-                    st.info(t("linkedin_browser_opening"))
+                st.info(t("linkedin_headless_login") if IS_CLOUD else t("linkedin_browser_opening"))
                 with st.spinner(t("linkedin_logging_in")):
                     from tools.linkedin_auth import login_linkedin
                     ok, msg = login_linkedin(li_email.strip(), li_password.strip())
@@ -126,25 +120,18 @@ def show_settings_dialog():
 
     # ── Tab 2: Cookie import ──────────────────────────────────────────────────
     with tab_cookie:
-        st.markdown("""
-**推荐方式 · 3 步完成，无需密码**
-
-1. 在浏览器安装扩展 **[Cookie-Editor](https://cookie-editor.com/)**（Chrome / Firefox 均支持）
-2. 打开 [linkedin.com](https://www.linkedin.com)，确认已登录
-3. 点击扩展图标 → 点击右上角「导出」按钮（Export） → 复制全部 JSON
-4. 粘贴到下方文本框，点击「导入」
-""")
+        st.markdown(t("linkedin_cookie_title") + "\n\n" + t("linkedin_cookie_steps"))
 
         cookie_json = st.text_area(
-            "粘贴 Cookie JSON",
+            t("linkedin_cookie_label"),
             height=160,
             placeholder='[{"name":"li_at","value":"AQED...","domain":".linkedin.com",...},...]',
             key="cookie_import_input",
         )
 
-        if st.button("📥 导入 Cookie", type="primary", use_container_width=True):
+        if st.button(t("linkedin_cookie_import"), type="primary", use_container_width=True):
             if not cookie_json.strip():
-                st.error("请先粘贴从浏览器导出的 Cookie JSON。")
+                st.error(t("linkedin_cookie_empty"))
             else:
                 from tools.linkedin_auth import import_cookies_from_json
                 ok, msg = import_cookies_from_json(cookie_json.strip())
