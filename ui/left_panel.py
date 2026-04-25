@@ -156,16 +156,19 @@ def _render_file_row(name: str, data: bytes, store: str):
 def _render_output_files_tab():
     st.caption(t("output_caption"))
 
+    # Key rotation: after processing, increment key so the widget resets and
+    # won't re-trigger on the next rerun (fixes infinite-refresh bug).
+    _uk = st.session_state.get("_ul_out_key", 0)
     uploaded = st.file_uploader(
         t("upload_files"),
         accept_multiple_files=True,
-        key="upload_output",
+        key=f"upload_output_{_uk}",
         label_visibility="collapsed",
     )
     if uploaded:
         for f in uploaded:
             save_output_file(f.name, f.getbuffer().tobytes())
-        st.success(f"✅ 已上传: {', '.join(f.name for f in uploaded)}")
+        st.session_state["_ul_out_key"] = _uk + 1  # reset uploader next rerun
         st.rerun()
 
     st.divider()
@@ -185,16 +188,17 @@ def _render_materials_section():
     with st.expander(t("materials_header"), expanded=True):
         st.caption(t("materials_caption"))
 
+        _mk = st.session_state.get("_ul_mat_key", 0)
         uploaded = st.file_uploader(
             t("upload_files"),
             accept_multiple_files=True,
-            key="upload_materials",
+            key=f"upload_materials_{_mk}",
             label_visibility="collapsed",
         )
         if uploaded:
             for f in uploaded:
                 save_material(f.name, f.getbuffer().tobytes())
-            st.success(f"✅ 已上传: {', '.join(f.name for f in uploaded)}")
+            st.session_state["_ul_mat_key"] = _mk + 1  # reset uploader next rerun
             st.rerun()
 
         st.divider()
