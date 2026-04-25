@@ -1,0 +1,23 @@
+# Secrets & session data (never commit)
+settings.json
+linkedin_session.json
+applications_log.json
+*.pyc
+__pycache__/
+.env
+
+# Generated outputs (per-user, transient)
+output/
+conversations/
+materials/
+
+# Python
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
