@@ -10,9 +10,8 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from agentscope.message import Msg
-
-from async_runner import run_async
+# agentscope and async_runner are imported lazily (inside functions) to avoid
+# slowing down the initial page load for every user.
 from tools.resume_manager import (
     get_resume_content,
     update_interactive_resume,
@@ -130,8 +129,10 @@ def _handle_job_apply(
     session_state: dict,
     resume_content: str,
 ) -> str:
+    from agentscope.message import Msg  # lazy — only loaded when actually applying
+    from async_runner import run_async
     from tools.linkedin_auth import is_session_valid
-    from tools.linkedin_applicator import apply_to_job, get_best_resume_pdf
+    from tools.linkedin_applicator import apply_to_job
 
     if not is_session_valid():
         return (
@@ -278,6 +279,11 @@ def process_message(
         generated_file_names: list[str] — filenames saved to session output_files
     """
     generated_files: list[str] = []
+
+    # Lazy-import heavy deps — only loaded when the first message is processed,
+    # not at page load time. Python caches them in sys.modules after first import.
+    from agentscope.message import Msg
+    from async_runner import run_async
 
     if resume_source is None:
         available     = detect_available_sources(conversation_messages)

@@ -181,8 +181,28 @@ _init_state()
 
 @st.cache_resource(show_spinner=False)
 def _ensure_playwright():
-    """Install Playwright Chromium browser once per server process."""
-    import subprocess, sys
+    """
+    Install Playwright Chromium only if not already present.
+    Cached per server process — runs at most once per restart.
+    First install: ~1-3 min download.  Subsequent starts: instant filesystem check.
+    """
+    import os, sys, subprocess
+    from pathlib import Path
+
+    # Check whether Chromium is already installed (fast filesystem glob)
+    search_dirs = [
+        Path.home() / ".cache" / "ms-playwright",                    # Linux/macOS
+        Path(os.environ.get("LOCALAPPDATA", "~")).expanduser()        # Windows
+            / "ms-playwright",
+    ]
+    for d in search_dirs:
+        try:
+            if d.exists() and any(d.glob("chromium-*")):
+                return  # already installed — done in <1 ms
+        except Exception:
+            pass
+
+    # Not found — install (only happens on first ever startup)
     try:
         subprocess.run(
             [sys.executable, "-m", "playwright", "install", "chromium"],
