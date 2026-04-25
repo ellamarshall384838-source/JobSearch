@@ -53,7 +53,7 @@ class ConversationStore:
         entries = [
             {
                 "id":         d["id"],
-                "title":      d.get("title", "新对话"),
+                "title":      d.get("title") or "New Conversation",
                 "created_at": d.get("created_at", ""),
                 "updated_at": d.get("updated_at", ""),
             }
@@ -61,12 +61,12 @@ class ConversationStore:
         ]
         return sorted(entries, key=lambda x: x["updated_at"], reverse=True)
 
-    def new_conversation(self) -> dict:
+    def new_conversation(self, title: str = "New Conversation") -> dict:
         conv_id = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
         now = datetime.now().isoformat()
         data = {
             "id":         conv_id,
-            "title":      "新对话",
+            "title":      title,
             "created_at": now,
             "updated_at": now,
             "messages":   [],

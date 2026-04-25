@@ -16,6 +16,7 @@ TEXTS: dict[str, dict[str, str]] = {
     "tab_conversations":    {"zh": "💬 对话",                    "en": "💬 Chats"},
     "tab_files":            {"zh": "📁 文件",                    "en": "📁 Files"},
     "new_chat":             {"zh": "＋ 新建对话",                 "en": "＋ New Chat"},
+    "new_conv_title":       {"zh": "新对话",                     "en": "New Conversation"},
     "no_chats":             {"zh": "暂无对话，点击上方按钮新建",    "en": "No chats yet. Click above to create one."},
     "output_caption":       {"zh": "AI 可读写此目录下的 .md 文件", "en": "AI can read/write .md files here"},
     "upload_files":         {"zh": "拖拽或选择文件上传",           "en": "Drag & drop or browse files"},

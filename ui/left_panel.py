@@ -32,7 +32,7 @@ def _file_icon(name: str) -> str:
 
 def _render_conversations_tab():
     if st.button(t("new_chat"), use_container_width=True, type="primary"):
-        data = _store.new_conversation()
+        data = _store.new_conversation(title=t("new_conv_title"))
         st.session_state.current_conv_id   = data["id"]
         st.session_state.current_conv_data = data
         st.session_state.resume_source     = None

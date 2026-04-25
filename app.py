@@ -222,7 +222,7 @@ if st.session_state.current_conv_id is None:
         st.session_state.current_conv_id   = existing[0]["id"]
         st.session_state.current_conv_data = _store.load_conversation(existing[0]["id"])
     else:
-        data = _store.new_conversation()
+        data = _store.new_conversation(title=t("new_conv_title"))
         st.session_state.current_conv_id   = data["id"]
         st.session_state.current_conv_data = data
 
