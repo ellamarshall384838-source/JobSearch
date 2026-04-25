@@ -42,21 +42,31 @@ st.markdown(
         padding-top: 0.75rem !important;
         padding-bottom: 0 !important;
     }
+    /* ── VSCode / ChatGPT style file & conversation buttons ── */
     div[data-testid="column"] .stButton > button {
-        text-align: left;
-        justify-content: flex-start;
+        text-align: left !important;
+        justify-content: flex-start !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        display: block !important;
+        padding-left: 6px !important;
+        font-size: 0.85rem !important;
+        line-height: 1.4 !important;
+    }
+    /* Keep icon tight to text */
+    div[data-testid="column"] .stButton > button p {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        margin: 0 !important;
     }
     div[data-testid="stChatInput"] { position: sticky; bottom: 0; }
     hr { margin: 0.3rem 0; }
-    .app-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.35rem 0.5rem 0.35rem 0;
-        border-bottom: 1px solid rgba(128,128,128,0.2);
-        margin-bottom: 0.5rem;
+    /* Remove border from scrollable panels so they blend in */
+    [data-testid="stVerticalBlockBorderWrapper"] > div > div:has(> [data-testid="stVerticalBlock"]) {
+        border: none !important;
     }
-    .app-header h2 { margin: 0; font-size: 1.3rem; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -66,7 +76,7 @@ st.markdown(
 
 def _init_state():
     defaults = {
-        "lang":              "zh",
+        "lang":              "en",
         "current_conv_id":   None,
         "current_conv_data": None,
         "preview_file":      None,
@@ -216,13 +226,19 @@ with settings_col:
 st.divider()
 
 # ── 3-column layout ───────────────────────────────────────────────────────────
+# Left and right panels get fixed-height scrollable containers so they each
+# have an independent scrollbar that doesn't affect the other columns.
+_PANEL_HEIGHT = 780   # px — adjust to taste for your screen resolution
+
 col_left, col_center, col_right = st.columns([2, 3, 2.5], gap="medium")
 
 with col_left:
-    render_left_panel()
+    with st.container(height=_PANEL_HEIGHT, border=False):
+        render_left_panel()
 
 with col_center:
     render_chat_panel()
 
 with col_right:
-    render_preview_panel()
+    with st.container(height=_PANEL_HEIGHT, border=False):
+        render_preview_panel()
